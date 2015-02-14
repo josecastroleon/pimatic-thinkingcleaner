@@ -1,0 +1,15 @@
+<script id="ThinkingCleanerDevice-template" type="text/template">
+  <li class="sortable device no-header thinkingcleanerdevice">
+    <label data-bind="text: name" class="device-label"/>
+    <div class="controls">
+      <div data-role="controlgroup" data-type="horizontal" data-mini="true" data-enhanced="true" class="button-control ui-controlgroup ui-controlgroup-horizontal ui-corner-all ui-mini no-carousel-slide">
+        <div class="ui-controlgroup-controls">
+          <a class="ui-first-child ui-btn ui-corner-all" name="cleanButton" data-bind="click: cleanMode">clean</a>
+          <a class="ui-btn ui-corner-all" name="maxButton" data-bind="click: maxMode">max</a>
+          <a class="ui-btn ui-corner-all" name="spotButton" data-bind="click: spotMode">spot</a>
+          <a class="ui-last-child ui-btn ui-corner-all" name="dockButton" data-bind="click: dockMode">dock</a>
+        </div>
+      </div>
+    </div>
+  </li>
+</script>

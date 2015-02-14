@@ -13,7 +13,7 @@ $(document).on( "templateinit", (event) ->
       return
 
     # define the available actions for the template
-    cleanMode: -> @sendcommand "clean"
+    cleanMode: -> @sendCommand "clean"
     maxMode: -> @sendCommand "max"
     spotMode: -> @sendCommand "spot"
     dockMode: -> @sendCommand "dock"

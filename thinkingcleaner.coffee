@@ -76,11 +76,6 @@ module.exports = (env) ->
       @state = state
       @emit "state", @state
 
-    cleanPressed: () -> @sendCommand clean
-    spotPressed: () -> @sendCommand spot
-    maxCleanPressed: () -> @sendCommand max
-    dockPressed: () -> @sendCommand dock
-
     sendCommand: (command) ->
       request "http://"+@host+"/command.json?command="+command, (error, response, body) =>
         if (!error && response.statusCode == 200) 

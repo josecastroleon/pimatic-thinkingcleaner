@@ -1,0 +1,25 @@
+{ "name": "pimatic-thinkingcleaner",
+  "description": "Control a thinking cleaner device from pimatic",
+  "author": "Jose Castro Leon <josecastroleon@gmail.com>",
+  "main": "thinkingcleaner",
+  "files": [
+    "thinkingcleaner.coffee",
+    "README.md",
+    "thinkingcleaner-config-schema.coffee"
+  ],
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/josecastroleon/pimatic-thinkingcleaner.git"
+  },
+  "configSchema": "thinkingcleaner-config-schema.coffee",
+  "dependencies": {
+  },
+  "peerDependencies": {
+    "pimatic": "0.8.*"
+  },
+  "engines": {
+    "node": ">0.8.x",
+    "npm": ">1.1.x"
+  }
+}

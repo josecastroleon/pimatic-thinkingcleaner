@@ -10,6 +10,8 @@ $(document).on( "templateinit", (event) ->
       @maxButton = $(elements).find('[name=maxButton]')
       @spotButton = $(elements).find('[name=spotButton]')
       @dockButton = $(elements).find('[name=dockButton]')
+      @findmeButton = $(elements).find('[name=findmeButton]')
+      @offButton = $(elements).find('[name=offButton]')
       return
 
     # define the available actions for the template
@@ -17,6 +19,8 @@ $(document).on( "templateinit", (event) ->
     maxMode: -> @sendCommand "max"
     spotMode: -> @sendCommand "spot"
     dockMode: -> @sendCommand "dock"
+    findmeMode: -> @sendCommand "find_me"
+    offMode: -> @sendCommand "poweroff"
 
     sendCommand: (command) ->
       @device.rest.sendCommand({command}, global: no)

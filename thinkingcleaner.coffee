@@ -61,18 +61,18 @@ module.exports = (env) ->
         request 'http://"+@host+"/status.json', (error, response, body) =>
           if (!error && response.statusCode == 200)
             data = JSON.parse(body)
-            _setState data.status.cleaner_state 
-            _setBattery data.status.battery_charge
+            @setState data.status.cleaner_state 
+            @setBattery data.status.battery_charge
       , @interval)
 
     getBattery: () -> Promise.resolve(@battery)
     getState: () -> Promise.resolve(@state)
 
-    _setBattery: (battery) ->
+    setBattery: (battery) ->
       @battery = battery
       @emit "battery", @battery
 
-    _setState: (state) ->
+    setState: (state) ->
       @state = state
       @emit "state", @state
 
@@ -80,6 +80,79 @@ module.exports = (env) ->
       request "http://"+@host+"/command.json?command="+command, (error, response, body) =>
         if (!error && response.statusCode == 200) 
           data = JSON.parse(body)
+
+  class ThinkingCleanerModeActionProvider extends env.actions.ActionProvider
+
+    constructor: (@framework) ->
+
+    parseAction: (input, context) =>
+      # The result the function will return:
+      retVar = null
+
+      tcleaners = _(@framework.deviceManager.devices).values().filter( 
+        (device) => device.hasAction("sendCommand") 
+      ).value()
+
+      if tcleaners.length is 0 then return
+
+      device = null
+      valueTokens = null
+      match = null
+
+      # Try to match the input string with:
+      M(input, context)
+        .match('set mode of ')
+        .matchDevice(thermostats, (next, d) =>
+          next.match(' to ')
+            .matchStringWithVars( (next, ts) =>
+              m = next.match(' mode', optional: yes)
+              if device? and device.id isnt d.id
+                context?.addError(""""#{input.trim()}" is ambiguous.""")
+                return
+              device = d
+              valueTokens = ts
+              match = m.getFullMatch()
+            )
+        )
+
+      if match?
+        if valueTokens.length is 1 and not isNaN(valueTokens[0])
+          value = valueTokens[0] 
+          assert(not isNaN(value))
+          modes = ["clean", "max", "spot", "dock", "findme", "off"] 
+          if modes.indexOf(value) < -1
+            context?.addError("Allowed modes: clean, max, spot, dock, findme, off")
+            return
+        return {
+          token: match
+          nextInput: input.substring(match.length)
+          actionHandler: new ThinkingCleanerModeActionHandler(@framework, device, valueTokens)
+        }
+      else 
+        return null
+
+  class ThinkingCleanerModeActionHandler extends env.actions.ActionHandler
+
+    constructor: (@framework, @device, @valueTokens) ->
+      assert @device?
+      assert @valueTokens?
+
+    _doExecuteAction: (simulate, value) =>
+      return (
+        if simulate
+          __("would set mode %s to %s%%", @device.name, value)
+        else
+          @device.sendCommand(value).then( => __("set mode %s to %s%%", @device.name, value) )
+      )
+
+    executeAction: (simulate) => 
+      @framework.variableManager.evaluateStringExpression(@valueTokens).then( (value) =>
+        @lastValue = value
+        return @_doExecuteAction(simulate, value)
+      )
+
+    hasRestoreAction: -> yes
+    executeRestoreAction: (simulate) => Promise.resolve(@_doExecuteAction(simulate, @lastValue))
 
   thinkingCleanerPlugin = new ThinkingCleanerPlugin
   return thinkingCleanerPlugin

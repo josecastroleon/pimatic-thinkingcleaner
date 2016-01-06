@@ -6,7 +6,8 @@
   "files": [
     "thinkingcleaner.coffee",
     "README.md",
-    "thinkingcleaner-config-schema.coffee"
+    "thinkingcleaner-config-schema.coffee",
+    "device-config-schema.coffee"
   ],
   "version": "0.8.2",
   "repository": {

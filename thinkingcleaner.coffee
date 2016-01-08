@@ -2,6 +2,9 @@ module.exports = (env) ->
 
   Promise = env.require 'bluebird'
   assert = env.require 'cassert'
+  _ = env.require 'lodash'
+  __ = env.require("i18n").__
+  M = env.matcher
 
   request = require 'request'
   Promise.promisifyAll(request)
@@ -14,6 +17,8 @@ module.exports = (env) ->
         configDef: deviceConfigDef.ThinkingCleanerDevice,
         createCallback: (config) -> new ThinkingCleanerDevice(config)
       })
+
+      @framework.ruleManager.addActionProvider(new ThinkingCleanerModeActionProvider(@framework))
 
       #wait till all plugins are loaded
       @framework.on "after init", =>
@@ -102,7 +107,7 @@ module.exports = (env) ->
       # Try to match the input string with:
       M(input, context)
         .match('set mode of ')
-        .matchDevice(thermostats, (next, d) =>
+        .matchDevice(tcleaners, (next, d) =>
           next.match(' to ')
             .matchStringWithVars( (next, ts) =>
               m = next.match(' mode', optional: yes)

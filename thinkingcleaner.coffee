@@ -5,9 +5,8 @@ module.exports = (env) ->
   _ = env.require 'lodash'
   __ = env.require("i18n").__
   M = env.matcher
-
   request = require 'request'
-  Promise.promisifyAll(request)
+
 
   class ThinkingCleanerPlugin extends env.plugins.Plugin
 
@@ -57,34 +56,48 @@ module.exports = (env) ->
       @id = @config.id
       @name = @config.name
       @host = @config.host
+      @_state = "off"
+      @_battery = 0
       @interval = @config.interval
       super()
-      @readLoop    
+      @readLoop()
 
-    readLoop: =>
+    readLoop: ->
       setInterval( =>
-        request 'http://"+@host+"/status.json', (error, response, body) =>
+        request "http://"+@host+"/status.json", (error, response, body) =>
           if (!error && response.statusCode == 200)
             data = JSON.parse(body)
-            @setState data.status.cleaner_state 
-            @setBattery data.status.battery_charge
+            if data.status?
+              @setState data.status.cleaner_state
+              @setBattery data.status.battery_charge
       , @interval)
 
     getBattery: () -> Promise.resolve(@battery)
     getState: () -> Promise.resolve(@state)
 
     setBattery: (battery) ->
-      @battery = battery
-      @emit "battery", @battery
+      @_battery = battery
+      @emit "battery", @_battery
+
+    getBattery: () ->
+      Promise.resolve @_battery
 
     setState: (state) ->
-      @state = state
-      @emit "state", @state
+      @_state = state
+      @emit "state", @_state
+
+    getState: () ->
+      Promise.resolve @_state
 
     sendCommand: (command) ->
-      request "http://"+@host+"/command.json?command="+command, (error, response, body) =>
-        if (!error && response.statusCode == 200) 
-          data = JSON.parse(body)
+      new Promise( (resolve, reject) =>
+        request "http://"+@host+"/command.json?command="+command, (error, response, body) =>
+          if (!error && response.statusCode == 200)
+            data = JSON.parse(body)
+            resolve data
+          else
+            reject error
+      )
 
   class ThinkingCleanerModeActionProvider extends env.actions.ActionProvider
 
@@ -145,9 +158,9 @@ module.exports = (env) ->
     _doExecuteAction: (simulate, value) =>
       return (
         if simulate
-          __("would set mode %s to %s%%", @device.name, value)
+          Promise.resolve __("would set mode %s to %s%%", @device.name, value)
         else
-          @device.sendCommand(value).then( => __("set mode %s to %s%%", @device.name, value) )
+          @device.sendCommand(value).then( => __("set mode %s to %s", @device.name, value) )
       )
 
     executeAction: (simulate) => 

@@ -56,6 +56,8 @@ module.exports = (env) ->
       @id = @config.id
       @name = @config.name
       @host = @config.host
+      # port member is used for testing purposes
+      @port = 80
       @_state = "off"
       @_battery = 0
       @interval = @config.interval
@@ -64,7 +66,7 @@ module.exports = (env) ->
 
     readLoop: ->
       setInterval( =>
-        request "http://"+@host+"/status.json", (error, response, body) =>
+        request "http://#{@host}:#{@port}/status.json", (error, response, body) =>
           if (!error && response.statusCode == 200)
             data = JSON.parse(body)
             if data.status?
@@ -90,13 +92,23 @@ module.exports = (env) ->
       Promise.resolve @_state
 
     sendCommand: (command) ->
+      switch command
+        when 'off' then (
+          command = 'poweroff'
+        )
+        when 'findme' then (
+          command = 'find_me'
+        )
       new Promise( (resolve, reject) =>
-        request "http://"+@host+"/command.json?command="+command, (error, response, body) =>
-          if (!error && response.statusCode == 200)
-            data = JSON.parse(body)
-            resolve data
+        request "http://#{@host}:#{@port}/command.json?command="+command, (error, response, body) =>
+          if not error?
+            if (response.statusCode == 200)
+              data = JSON.parse(body)
+              resolve data
+            else
+              reject "Unexpected HTTP response status code #{response.statusCode}"
           else
-            reject error
+            reject error.message ? error
       )
 
   class ThinkingCleanerModeActionProvider extends env.actions.ActionProvider

@@ -168,11 +168,17 @@ module.exports = (env) ->
       assert @valueTokens?
 
     _doExecuteAction: (simulate, value) =>
-      return (
+      new Promise( (resolve, reject) =>
         if simulate
-          Promise.resolve __("would set mode %s to %s%%", @device.name, value)
+          resolve __("would set mode %s to %s%%", @device.name, value)
         else
-          @device.sendCommand(value).then( => __("set mode %s to %s", @device.name, value) )
+          @device.sendCommand(value)
+          .then( =>
+            resolve __("set mode %s to %s", @device.name, value)
+          )
+          .catch( (error) =>
+            reject if error instanceof Error then error else new Error(error)
+          )
       )
 
     executeAction: (simulate) => 

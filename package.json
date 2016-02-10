@@ -6,14 +6,19 @@
   "files": [
     "thinkingcleaner.coffee",
     "README.md",
+    "LICENSE",
     "thinkingcleaner-config-schema.coffee",
     "device-config-schema.coffee",
     "app"
   ],
-  "version": "0.8.2",
+  "version": "0.8.3",
+  "license": "GPL-2.0",
   "repository": {
     "type": "git",
     "url": "git://github.com/josecastroleon/pimatic-thinkingcleaner.git"
+  },
+  "bugs": {
+    "url": "https://github.com/josecastroleon/pimatic-thinkingcleaner/issues"
   },
   "configSchema": "thinkingcleaner-config-schema.coffee",
   "dependencies": {

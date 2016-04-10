@@ -6,10 +6,10 @@ module.exports = {
     properties:
       host:
         description: "IP address of the device"
-        default: "192.168.1.3"
+        type: "string"
       interval:
         description: "Interval between read requests"
-        format: "number"
+        type: "number"
         default: 10000
   }
 }

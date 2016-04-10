@@ -21,7 +21,7 @@ module.exports = (env) ->
 
       #wait till all plugins are loaded
       @framework.on "after init", =>
-        # Check if the mobile-frontent was loaded and get a instance
+        # Check if the mobile-frontend was loaded and get a instance
         mobileFrontend = @framework.pluginManager.getPlugin 'mobile-frontend'
         if mobileFrontend?
           mobileFrontend.registerAssetFile 'js', "pimatic-thinkingcleaner/app/thinkingcleaner.coffee"

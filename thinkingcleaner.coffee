@@ -56,13 +56,15 @@ module.exports = (env) ->
       @id = @config.id
       @name = @config.name
       @host = @config.host
-      # port member is used for testing purposes
-      @port = 80
+      @port = @config.port
       @_state = "off"
       @_battery = 0
       @interval = @config.interval
       super()
       @readLoop()
+
+    destroy: () ->
+      super()
 
     readLoop: ->
       setInterval( =>

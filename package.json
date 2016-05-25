@@ -11,7 +11,7 @@
     "device-config-schema.coffee",
     "app"
   ],
-  "version": "0.8.5",
+  "version": "0.8.6",
   "license": "GPL-2.0",
   "repository": {
     "type": "git",

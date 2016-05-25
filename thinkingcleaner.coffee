@@ -64,10 +64,11 @@ module.exports = (env) ->
       @readLoop()
 
     destroy: () ->
+      clearInterval @readLoopTimeout if @readLoopTimeout?
       super()
 
     readLoop: ->
-      setInterval( =>
+      @readLoopTimeout = setInterval( =>
         request "http://#{@host}:#{@port}/status.json", (error, response, body) =>
           if (!error && response.statusCode == 200)
             data = JSON.parse(body)
